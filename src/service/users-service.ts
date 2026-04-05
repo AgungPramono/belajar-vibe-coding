@@ -51,13 +51,11 @@ export async function createUser(
 }
 
 export async function logoutUser(token: string) {
-  const session = await db.select().from(sessions).where(eq(sessions.token, token));
+  const result = await db.delete(sessions).where(eq(sessions.token, token));
 
-  if (session.length === 0) {
+  if (result[0].affectedRows === 0) {
     throw new Error("Unauthorized");
   }
-
-  await db.delete(sessions).where(eq(sessions.token, token));
 
   return "OK";
 }
