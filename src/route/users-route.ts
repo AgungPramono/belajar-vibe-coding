@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { createUser } from "../service/users-service";
+import { createUser, loginUser } from "../service/users-service";
 
 export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
   "/",
@@ -17,4 +17,17 @@ export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
       return { error: (error as Error).message };
     }
   }
-);
+)
+  .post("/login", async ({ body, set }) => {
+    try {
+      const { email, password } = body as {
+        email: string;
+        password: string;
+      };
+      const token = await loginUser(email, password);
+      return { data: token };
+    } catch (error) {
+      set.status = 400;
+      return { error: (error as Error).message };
+    }
+  });
