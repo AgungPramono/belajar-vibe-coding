@@ -30,6 +30,22 @@ export async function createUser(
   email: string,
   password: string
 ) {
+  if (!name || name.trim().length === 0) {
+    throw new Error("Nama tidak boleh kosong");
+  }
+  if (name.length > 255) {
+    throw new Error("Nama maksimal 255 karakter");
+  }
+  if (!email || email.trim().length === 0) {
+    throw new Error("Email tidak boleh kosong");
+  }
+  if (email.length > 255) {
+    throw new Error("Email maksimal 255 karakter");
+  }
+  if (!password || password.length < 6) {
+    throw new Error("Password minimal 6 karakter");
+  }
+
   const existing = await db
     .select()
     .from(users)
