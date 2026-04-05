@@ -1,62 +1,78 @@
-import { Elysia } from "elysia";
-import { createUser, loginUser, getCurrentUser, logoutUser } from "../service/users-service";
+import { Elysia, t } from "elysia";
+import {
+  createUser,
+  loginUser,
+  getCurrentUser,
+  logoutUser,
+} from "../service/users-service";
+
+const SAFE_AUTH_ERRORS = new Set([
+  "Nama tidak boleh kosong",
+  "Nama maksimal 255 karakter",
+  "Email tidak boleh kosong",
+  "Email maksimal 255 karakter",
+  "Password minimal 6 karakter",
+  "email sudah terdaftar",
+  "Email atau Password Salah",
+]);
 
 function extractBearerToken(request: Request): string | null {
   const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
+  if (!authHeader?.startsWith("Bearer ")) return null;
   return authHeader.slice(7);
 }
 
-export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
-  "/",
-  async ({ body, set }) => {
-    try {
-      const { name, email, password } = body as {
-        name: string;
-        email: string;
-        password: string;
-      };
-      await createUser(name, email, password);
-      return { data: "OK" };
-    } catch (error) {
-      const message = (error as Error).message;
-      const safeErrors = [
-        "Nama tidak boleh kosong",
-        "Nama maksimal 255 karakter",
-        "Email tidak boleh kosong",
-        "Email maksimal 255 karakter",
-        "Password minimal 6 karakter",
-        "email sudah terdaftar",
-      ];
-
-      set.status = 400;
-      if (safeErrors.includes(message)) {
-        return { error: message };
-      }
-      return { error: "Terjadi kesalahan pada server" };
-    }
+function handleClientError(error: unknown, set: { status?: number | string }) {
+  const message = (error as Error).message;
+  if (SAFE_AUTH_ERRORS.has(message)) {
+    set.status = 400;
+    return { error: message };
   }
-)
-  .post("/login", async ({ body, set }) => {
-    try {
-      const { email, password } = body as {
-        email: string;
-        password: string;
-      };
-      const token = await loginUser(email, password);
-      return { data: token };
-    } catch (error) {
-      const message = (error as Error).message;
-      const safeErrors = ["Email atau Password Salah"];
+  set.status = 500;
+  return { error: "Terjadi kesalahan pada server" };
+}
 
-      set.status = 400;
-      if (safeErrors.includes(message)) {
-        return { error: message };
+export const usersRoute = new Elysia({ prefix: "/api/users" })
+
+  .post(
+    "/",
+    async ({ body, set }) => {
+      try {
+        await createUser(body.name, body.email, body.password);
+        set.status = 201;
+        return { data: "OK" };
+      } catch (error) {
+        return handleClientError(error, set);
       }
-      return { error: "Terjadi kesalahan pada server" };
+    },
+    {
+      body: t.Object({
+        name: t.String(),
+        email: t.String(),
+        password: t.String(),
+      }),
     }
-  })
-  .post("/current", async ({ request, set }) => {
+  )
+
+  .post(
+    "/login",
+    async ({ body, set }) => {
+      try {
+        const token = await loginUser(body.email, body.password);
+        return { data: token };
+      } catch (error) {
+        return handleClientError(error, set);
+      }
+    },
+    {
+      body: t.Object({
+        email: t.String(),
+        password: t.String(),
+      }),
+    }
+  )
+
+  .get("/current", async ({ request, set }) => {
     try {
       const token = extractBearerToken(request);
       if (!token) {
@@ -65,12 +81,13 @@ export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
       }
       const user = await getCurrentUser(token);
       return { data: user };
-    } catch (error) {
+    } catch {
       set.status = 401;
       return { error: "Unauthorized" };
     }
   })
-  .post("/logout", async ({ request, set }) => {
+
+  .delete("/logout", async ({ request, set }) => {
     try {
       const token = extractBearerToken(request);
       if (!token) {
@@ -79,7 +96,7 @@ export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
       }
       const result = await logoutUser(token);
       return { data: result };
-    } catch (error) {
+    } catch {
       set.status = 401;
       return { error: "Unauthorized" };
     }
