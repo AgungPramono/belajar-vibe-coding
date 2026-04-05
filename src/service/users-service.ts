@@ -50,6 +50,16 @@ export async function createUser(
   return "OK";
 }
 
+export async function logoutUser(token: string) {
+  const result = await db.delete(sessions).where(eq(sessions.token, token));
+
+  if (result[0].affectedRows === 0) {
+    throw new Error("Unauthorized");
+  }
+
+  return "OK";
+}
+
 export async function loginUser(email: string, password: string) {
   const result = await db.select().from(users).where(eq(users.email, email));
 
