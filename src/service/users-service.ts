@@ -11,17 +11,17 @@ export async function getCurrentUser(token: string) {
     throw new Error("Unauthorized");
   }
 
-  const user = await db.select().from(users).where(eq(users.id, session[0].userId));
+  const user = await db.select().from(users).where(eq(users.id, session[0]!.userId));
 
   if (user.length === 0) {
     throw new Error("Unauthorized");
   }
 
   return {
-    id: String(user[0].id),
-    name: user[0].name,
-    email: user[0].email,
-    created_at: user[0].createdAt,
+    id: String(user[0]!.id),
+    name: user[0]!.name,
+    email: user[0]!.email,
+    created_at: user[0]!.createdAt,
   };
 }
 
@@ -57,7 +57,7 @@ export async function loginUser(email: string, password: string) {
     throw new Error("Email atau Password Salah");
   }
 
-  const user = result[0];
+  const user = result[0]!;
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -66,7 +66,7 @@ export async function loginUser(email: string, password: string) {
 
   const token = randomUUID();
 
-  await db.insert(sessions).values({ token, userId: user.id });
+  await db.insert(sessions).values({ token, userId: user.id! });
 
   return token;
 }
