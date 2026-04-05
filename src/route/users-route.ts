@@ -19,8 +19,21 @@ export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
       await createUser(name, email, password);
       return { data: "OK" };
     } catch (error) {
+      const message = (error as Error).message;
+      const safeErrors = [
+        "Nama tidak boleh kosong",
+        "Nama maksimal 255 karakter",
+        "Email tidak boleh kosong",
+        "Email maksimal 255 karakter",
+        "Password minimal 6 karakter",
+        "email sudah terdaftar",
+      ];
+
       set.status = 400;
-      return { error: (error as Error).message };
+      if (safeErrors.includes(message)) {
+        return { error: message };
+      }
+      return { error: "Terjadi kesalahan pada server" };
     }
   }
 )
@@ -33,8 +46,14 @@ export const usersRoute = new Elysia({ prefix: "/api/users" }).post(
       const token = await loginUser(email, password);
       return { data: token };
     } catch (error) {
+      const message = (error as Error).message;
+      const safeErrors = ["Email atau Password Salah"];
+
       set.status = 400;
-      return { error: (error as Error).message };
+      if (safeErrors.includes(message)) {
+        return { error: message };
+      }
+      return { error: "Terjadi kesalahan pada server" };
     }
   })
   .post("/current", async ({ request, set }) => {
