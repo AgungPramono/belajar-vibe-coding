@@ -51,6 +51,14 @@ export const usersRoute = new Elysia({ prefix: "/api/users" })
         email: t.String(),
         password: t.String(),
       }),
+      response: {
+        201: t.Object({
+          data: t.String({ default: "OK" }),
+        }),
+        400: t.Object({
+          error: t.String(),
+        }),
+      },
       detail: {
         tags: ["Users"],
         summary: "Register User Baru",
@@ -74,6 +82,14 @@ export const usersRoute = new Elysia({ prefix: "/api/users" })
         email: t.String(),
         password: t.String(),
       }),
+      response: {
+        200: t.Object({
+          data: t.String({ default: "uuid-session-token" }),
+        }),
+        400: t.Object({
+          error: t.String(),
+        }),
+      },
       detail: {
         tags: ["Users"],
         summary: "Login User",
@@ -97,6 +113,19 @@ export const usersRoute = new Elysia({ prefix: "/api/users" })
       return { error: "Unauthorized" };
     }
   }, {
+    response: {
+      200: t.Object({
+        data: t.Object({
+          id: t.String(),
+          name: t.String(),
+          email: t.String(),
+          created_at: t.Date(),
+        }),
+      }),
+      401: t.Object({
+        error: t.String({ default: "Unauthorized" }),
+      }),
+    },
     detail: {
       tags: ["Users"],
       summary: "Dapatkan Data Diri Pengguna Aktif",
@@ -118,6 +147,14 @@ export const usersRoute = new Elysia({ prefix: "/api/users" })
       return { error: "Unauthorized" };
     }
   }, {
+    response: {
+      200: t.Object({
+        data: t.String({ default: "OK" }),
+      }),
+      401: t.Object({
+        error: t.String({ default: "Unauthorized" }),
+      }),
+    },
     detail: {
       tags: ["Users"],
       summary: "Logout Pengguna",
