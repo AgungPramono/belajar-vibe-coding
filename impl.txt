@@ -2,16 +2,9 @@ buatkan issue.md yang berisi perencanaan untuk nanti dikerjakan oleh junior prog
 
 Isi dari planning nya adalah sebagai berikut:
 
-Buatkan unit test untuk semua api yang tersedia 
+saya mau tambahkan fitur sweagger di project ini, agar user lain yang mau menggunakan API di app ini lebih mudah tinggal membuka sweagger nya.
 
-simpan di folder test, menggunakan bun test
-
-setiap skenario, hapus datanya terlebih dahulu agar konsisten
-
-buat skenario test per API selengkap mungkin
-
-Jangan buatkan terlalu detail instruksi unit testnya buatkan saja skenario apa yg harus di test, biarkan nanti yg implementasi
-detail skenarionya junior programmer atau model yg lebih murah
+buatkan tahapan2 yg harus di lakukan untuk implementasi fitur ini, jelaskan secara detail dengan target junior programmer atau model yg lebih murah
 
 
 
