@@ -4,6 +4,7 @@ import { usersRoute } from "./route/users-route";
 
 export const app = new Elysia()
   .use(swagger({
+    path: '/swagger',
     documentation: {
       info: {
         title: 'Belajar Vibe Coding API',
@@ -26,5 +27,6 @@ export const app = new Elysia()
 if (process.env.NODE_ENV !== "test") {
   app.listen(3000);
   console.log(`Server running at http://localhost:${app.server?.port}`);
+  console.log("Routes:", app.routes.map(r => `${r.method} ${r.path}`));
 }
 
