@@ -4,6 +4,13 @@ import { randomUUID } from "crypto";
 import { db } from "../db";
 import { users, sessions } from "../db/schema";
 
+/**
+ * Mendapatkan data pengguna yang sedang aktif berdasarkan token sesi.
+ * Akan melempar error "Unauthorized" jika token tidak valid atau pengguna tidak ditemukan.
+ * 
+ * @param token Token sesi dari pengguna yang terautentikasi.
+ * @returns Object berisi id, nama, email, dan tanggal pembuatan akun.
+ */
 export async function getCurrentUser(token: string) {
   const session = await db.select().from(sessions).where(eq(sessions.token, token));
 
@@ -25,6 +32,16 @@ export async function getCurrentUser(token: string) {
   };
 }
 
+/**
+ * Mendaftarkan pengguna (user) baru ke dalam sistem (Registrasi).
+ * Melakukan validasi format input, mengecek ketersediaan email, 
+ * dan melakukan hashing pada password sebelum menyimpannya ke database.
+ * 
+ * @param name Nama lengkap pengguna (wajib, max 255 karakter).
+ * @param email Alamat email pengguna (wajib, unik, max 255 karakter).
+ * @param password Kata sandi untuk login (wajib, minimal 6 karakter).
+ * @returns String "OK" jika pengguna berhasil dibuat.
+ */
 export async function createUser(
   name: string,
   email: string,
@@ -66,6 +83,12 @@ export async function createUser(
   return "OK";
 }
 
+/**
+ * Menghapus sesi aktif pengguna dari database (Logout).
+ * 
+ * @param token Token sesi yang ingin invalidasi / dihapus.
+ * @returns String "OK" jika sesi berhasil dihapus.
+ */
 export async function logoutUser(token: string) {
   const result = await db.delete(sessions).where(eq(sessions.token, token));
 
@@ -76,6 +99,15 @@ export async function logoutUser(token: string) {
   return "OK";
 }
 
+/**
+ * Melakukan autentikasi kredensial pengguna (Login).
+ * Memeriksa kecocokan email dan mencocokkan hash password. Jika kredensial valid,
+ * sistem akan membuatkan sesi (token) baru untuk pengguna tersebut.
+ * 
+ * @param email Email pengguna yang telah terdaftar.
+ * @param password Kata sandi pengguna.
+ * @returns Token string (UUID) otorisasi sesi yang sah.
+ */
 export async function loginUser(email: string, password: string) {
   const result = await db.select().from(users).where(eq(users.email, email));
 

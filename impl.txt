@@ -1,0 +1,13 @@
+buatkan issue.md yang berisi perencanaan untuk nanti dikerjakan oleh junior programmer atau ai model yang lebih murah
+
+Isi dari planning nya adalah sebagai berikut:
+
+saya mau tambahkan fitur sweagger di project ini, agar user lain yang mau menggunakan API di app ini lebih mudah tinggal membuka sweagger nya.
+
+lengkapi contoh request dan respon nya
+
+buatkan tahapan2 yg harus di lakukan untuk implementasi fitur ini, jelaskan secara detail dengan target junior programmer atau model yg lebih murah
+
+
+
+
